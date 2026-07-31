@@ -1,0 +1,297 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #EDF0F6;
+  --surface: #FFFFFF;
+  --ink: #1C2033;
+  --ink-muted: #6B7280;
+  --accent: #33478A;
+  --accent-soft: #E7ECFA;
+  --good: #2F9E6E;
+  --good-soft: #E4F5ED;
+  --danger: #D1483F;
+  --border: #DCE1EC;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  font-family: 'Inter', sans-serif;
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 48px 20px;
+}
+
+#root {
+  width: 100%;
+  max-width: 480px;
+}
+
+h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 24px;
+  letter-spacing: -0.02em;
+}
+
+/* ---- Login ekran ---- */
+
+.login-card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 40px 32px;
+  box-shadow: 0 1px 3px rgba(28, 32, 51, 0.06), 0 8px 24px rgba(28, 32, 51, 0.06);
+  margin-top: 80px;
+}
+
+.login-card h1 {
+  text-align: center;
+}
+
+.login-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-error {
+  color: var(--danger);
+  font-size: 14px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* ---- Zajednicki input/dugme stilovi ---- */
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: var(--accent);
+}
+
+button {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+.login-card button {
+  background: var(--accent);
+  color: white;
+  padding: 12px;
+  margin-top: 4px;
+}
+
+/* ---- Header sa naslovom ---- */
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 20px;
+}
+
+.app-header h1 {
+  margin: 0;
+}
+
+/* ---- Traka napretka (potpisni element) ---- */
+
+.progress-strip {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 2px rgba(28, 32, 51, 0.05);
+}
+
+.progress-label {
+  font-size: 13px;
+  color: var(--ink-muted);
+  margin-bottom: 8px;
+}
+
+.progress-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--good);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* ---- Forma za dodavanje ---- */
+
+.add-task-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.add-task-form input {
+  flex: 1;
+}
+
+.add-task-form button {
+  background: var(--accent);
+  color: white;
+  padding: 0 20px;
+}
+
+/* ---- Lista taskova ---- */
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task-card {
+  background: var(--surface);
+  border-left: 4px solid var(--accent);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 1px 2px rgba(28, 32, 51, 0.05);
+  transition: border-color 0.2s ease, background-color 0.3s ease;
+}
+
+.task-card.completed {
+  border-left-color: var(--good);
+  background: var(--good-soft);
+}
+
+.task-title {
+  flex: 1;
+  font-size: 15px;
+}
+
+.task-card.completed .task-title {
+  color: var(--ink-muted);
+  text-decoration: line-through;
+}
+
+/* Custom checkbox */
+.task-checkbox {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  flex-shrink: 0;
+  display: grid;
+  place-content: center;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.task-checkbox:checked {
+  background: var(--good);
+  border-color: var(--good);
+}
+
+.task-checkbox:checked::after {
+  content: '✓';
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.delete-btn {
+  background: transparent;
+  color: var(--ink-muted);
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.delete-btn:hover {
+  color: var(--danger);
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 14px;
+  padding: 32px 0;
+}
+
+.toggle-auth {
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-muted);
+  margin-top: 16px;
+}
+
+.toggle-auth span {
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toggle-auth span:hover {
+  text-decoration: underline;
+}
+
+.edit-input {
+  flex: 1;
+  padding: 8px 10px;
+}
+
+.edit-btn {
+  background: transparent;
+  color: var(--ink-muted);
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-btn:hover {
+  color: var(--accent);
+}
+
+.save-btn {
+  background: var(--accent);
+  color: white;
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
