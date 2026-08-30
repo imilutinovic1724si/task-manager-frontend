@@ -1,18 +1,23 @@
 import { useEffect, useState } from 'react';
 import './App.css'
 
-const fetchWithRetry = async (url, options, maxTotalTime = 90000) => {
+const fetchWithRetry = async (url, options, maxTotalTime = 90000, perAttemptTimeout = 15000) => {
   const startTime = Date.now()
   let delay = 2000
 
   while (Date.now() - startTime < maxTotalTime) {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), perAttemptTimeout)
+
     try {
-      const response = await fetch(url, options)
+      const response = await fetch(url, { ...options, signal: controller.signal })
+      clearTimeout(timeoutId)
       if (response.ok || response.status === 400 || response.status === 401 || response.status === 500) {
         return response
       }
       throw new Error('Server nije spreman')
     } catch (error) {
+      clearTimeout(timeoutId)
       const elapsed = Date.now() - startTime
       if (elapsed + delay >= maxTotalTime) {
         throw new Error('Server se ne odaziva, pokusaj ponovo za par minuta')
