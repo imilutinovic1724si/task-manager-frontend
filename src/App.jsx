@@ -1,6 +1,30 @@
 import { useEffect, useState } from 'react';
 import './App.css'
 
+const fetchWithRetry = async (url, options, maxTotalTime = 90000) => {
+  const startTime = Date.now()
+  let delay = 2000
+
+  while (Date.now() - startTime < maxTotalTime) {
+    try {
+      const response = await fetch(url, options)
+      if (response.ok || response.status === 400 || response.status === 401 || response.status === 500) {
+        return response
+      }
+      throw new Error('Server nije spreman')
+    } catch (error) {
+      const elapsed = Date.now() - startTime
+      if (elapsed + delay >= maxTotalTime) {
+        throw new Error('Server se ne odaziva, pokusaj ponovo za par minuta')
+      }
+      await new Promise((resolve) => setTimeout(resolve, delay))
+      delay = Math.min(delay * 1.6, 13000)
+    }
+  }
+
+  throw new Error('Server se ne odaziva, pokusaj ponovo za par minuta')
+}
+
 function App() {
   const [token, setToken] = useState(null)
   const [username, setUsername] = useState('')
@@ -13,43 +37,56 @@ function App() {
   const [taskError, setTaskError] = useState('')
   const [editingTaskId, setEditingTaskId] = useState(null)
   const [editedTitle, setEditedTitle] = useState('')
+  const [isConnecting, setIsConnecting] = useState(false)
   
-  const handleLogin = (e) => {
-    e.preventDefault()
-    setLoginError('')
+  const handleLogin = async (e) => {
+  e.preventDefault()
+  setLoginError('')
+  setIsConnecting(true)
 
-    fetch('https://task-manager-backend-2fyg.onrender.com/api/auth/login', {
+  try {
+    const response = await fetchWithRetry('https://task-manager-backend-2fyg.onrender.com/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Pogresno korisnicko ime ili lozinka')
-        }
-        return response.text()
-      })
-      .then((data) => setToken(data))
-      .catch((error) => setLoginError(error.message))
-  }
 
-  const handleRegister = (e) => {
+    if (!response.ok) {
+      throw new Error('Pogresno korisnicko ime ili lozinka')
+    }
+
+    const data = await response.text()
+    setToken(data)
+  } catch (error) {
+    setLoginError(error.message)
+  } finally {
+    setIsConnecting(false)
+  }
+}
+
+  const handleRegister = async (e) => {
   e.preventDefault()
   setLoginError('')
+  setIsConnecting(true)
 
-  fetch('https://task-manager-backend-2fyg.onrender.com/api/auth/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, email, password }),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Korisnicko ime je vec zauzeto')
-      }
-      return response.text()
+  try {
+    const response = await fetchWithRetry('https://task-manager-backend-2fyg.onrender.com/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password }),
     })
-    .then((data) => setToken(data))
-    .catch((error) => setLoginError(error.message))
+
+    if (!response.ok) {
+      throw new Error('Korisnicko ime je vec zauzeto')
+    }
+
+    const data = await response.text()
+    setToken(data)
+  } catch (error) {
+    setLoginError(error.message)
+  } finally {
+    setIsConnecting(false)
+  }
 }
 
   const handleAddTask = (e) => {
@@ -175,10 +212,11 @@ const handleSaveEdit = (task) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">
-          {isRegistering ? 'Registruj se' : 'Prijavi se'}
+        <button type="submit" disabled={isConnecting}>
+           {isConnecting ? 'Povezujem se...' : (isRegistering ? 'Registruj se' : 'Prijavi se')}
         </button>
       </form>
+      {isConnecting && <p className="connecting-msg">Povezujem se sa serverom, ovo moze potrajati do minut...</p>}
       {loginError && <p className="login-error">{loginError}</p>}
       <p className="toggle-auth">
         {isRegistering ? 'Vec imas nalog?' : 'Nemas nalog?'}{' '}

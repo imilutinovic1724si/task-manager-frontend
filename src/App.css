@@ -295,3 +295,9 @@ ul {
   border-radius: 8px;
 }
 
+.connecting-msg {
+  color: var(--ink-muted);
+  font-size: 14px;
+  margin-top: 12px;
+  text-align: center;
+}
